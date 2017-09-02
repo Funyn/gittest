@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎来到测试界面</title>
+
+    <style>
+        *{
+            text-align: center;
+        }
+        .inp{
+            border: 1px solid gray;
+            padding:0 10px;
+            width:200px;
+            height:30px;
+            font-size:18px;
+            border-radius: 5px;
+        }
+
+        #embed-submit{
+            width:100px;
+            height:30px;
+            cursor:pointer;
+            border:1px solid gray;
+            font-size:18px;
+
+        }
+        {#        验证码位置#}
+        #embed-captcha{
+            width:300px;
+            margin: 0 auto;
+        }
+        .show{
+            display:block;
+        }
+        .hide{
+            display:none;
+        }
+        #notice{
+            color:red;
+        }
+{#        #mask{#}
+{#            display:none;#}
+{#            position:fixed;#}
+{#            text-align:center;#}
+{#            left:0;#}
+{#            top:0;#}
+{#            width: 100%;#}
+{#            height: 100%;#}
+{#            background-color: rgba(0,0,0,0.5);#}
+{#            overflow:auto;#}
+{#        }#}
+{#        .popup-mobile {#}
+{#            position: relative;#}
+{#        }#}
+{#        #popup-captcha-mobile {#}
+{#            position: fixed;#}
+{#            display: none;#}
+{#            left: 50%;#}
+{#            top: 50%;#}
+{#            transform: translate(-50%, -50%);#}
+{#            -webkit-transform: translate(-50%, -50%);#}
+{#            z-index: 9999;#}
+{#        }#}
+
+    </style>
+</head>
+<body>
+<script src="http://code.jquery.com/jquery-1.12.3.min.js"></script>
+<script src="../static/gt.js"></script>
+<h1 style="text-align: center;">欢迎来到测试页面</h1>
+<hr />
+<br />
+<br />
+    <form class="popup" action="{{ url_for('validate') }}" method="post">
+        <h2>使用ajax异步提交的验证码</h2>
+        <br />
+            <p>
+                <label for="username">用户名:</label>
+                <input class='inp' type="text"  id='username' name="username">
+                <br />
+            </p>
+            <p>
+                <label for="password">密&emsp;码:</label>
+                <input class='inp' type="password"  id='password' name="password">
+                 <br />
+            </p>
+
+                <div id="embed-captcha"></div>
+                <p id="wait" class="show">正在加载.......</p>
+                <p id="notice" class="hide">请点击验证</p>
+                <br />
+
+            <input type="submit"  id="embed-submit" value="提交">
+    </form>
+    <script>
+            var handlerEmbed = function(captchaObj){
+                $('#embed-submit').click(function(e){
+                    var validate = captchaObj.getValidate();
+                    if(!validate){
+                        $('#notice')[0].className = 'show';
+                        setTimeout(function(){
+                            $('#notice')[0].className = 'hide';
+                        },2000);
+                        e.preventDefault();
+                    }
+                });
+                captchaObj.appendTo('#embed-captcha');
+                captchaObj.onReady(function(){
+                    $('#wait')[0].className = 'hide';
+                })
+            };
+            $.ajax({
+                url:"/pc-geetest/register?t=" + (new Date()).getTime(),
+                type:'get',
+                dataType:'json',
+                success:function(data){
+                    console.log(data);
+                    initGeetest({
+                        gt:data.gt,
+                        challenge:data.challenge,
+                        product:'popup',
+                        offline:!data.success
+                    },handlerEmbed);
+                }
+            });
+    </script>
+</body>
+</html>
